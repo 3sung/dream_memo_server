@@ -1,17 +1,21 @@
 const app = require('express')();
 const database = require('./database');
 
-database.connect(function (connection) {
-    connection.query(
-        "SELECT * FROM DREAMMEMO_DB.User_TB;",
-        function (err, rows, fields) {
-            console.log(rows)
-        })
-});
+const user = require('./manage/user');
 
-app.get('/', (req, res)=> {
-    console.log('접속 탐지')
-    res.send('success')
+app.post('/signUp', (req, res)=> {
+    console.log(req);
+    database.connect(function (connection) {
+        user.signUp(connection,
+            (rows)=>{
+            req.send("success")
+                connection.release()
+            },
+            (err)=>{
+            req.send("fail")
+
+            }, req.body.userID, req.body.userEmail, req.body.userPW)
+    });
 });
 
 app.listen(80, () => {

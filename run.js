@@ -1,6 +1,7 @@
 const app = require('express')();
 const database = require('./database');
 const user = require('./manage/user');
+const community = require('./manage/community');
 
 
 app.post('/signUp', (req, res)=> {
@@ -66,19 +67,37 @@ app.post('/delete', (req, res)=> {
     });
 });
 
-
-// database.connect(function (connection) {
-//     connection.query(
-//         "SELECT * FROM DREAMMEMO_DB.User_TB;",
-//         function (err, rows, fields) {
-//             console.log(rows)
-//         })
-// });
-
 app.get('/', (req, res)=> {
     console.log('접속 탐지')
     res.send('success')
 });
+
+app.get('/board', (req, res)=>{
+    database.connect(function (connection) {
+        community.viewBoard(connection,
+            (rows)=>{
+                res.send(rows)
+            },
+            (err)=>{
+                console.error("/board 조회 오류 : "+err);
+                res.send("fail")
+            })
+    })
+});
+
+app.get('/board/search', (req, res)=>{
+    database.connect(function (connection) {
+        community.searchBoard(connection,
+            (rows)=>{
+                res.send(rows)
+            },
+            (err)=>{
+                console.error("/board/search 조회 검색 오류 : "+err);
+                res.send("fail")
+            }, req.query.keyword)
+    })
+});
+
 
 app.listen(80, () => {
     console.log('App listening on port 3000!');

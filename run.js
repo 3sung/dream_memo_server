@@ -9,31 +9,29 @@ app.post('/signUp', (req, res)=> {
     database.connect(function (connection) {
         user.signUp(connection,
             (rows)=>{
-            req.send("success")
+            res.send("success")
             connection.release();
             },
             (err)=>{
-            req.send("fail")
+            res.send("fail")
             connection.release();
             }, req.body.userID, req.body.userEmail, req.body.userPW)
     });
 });
 
 app.get('/signIn', (req, res)=> {
-    console.log(req);
     database.connect(function (connection){
         user.signIn(connection,
         (rows)=>{
         res.json({
-            token: user.getToken(req.body.userID)
+            token: user.getToken(connection, req.query.userID)
         });
-        req.send("success")
         connection.release();
         },
         (err)=>{
-        req.send("fail")
+        res.send("fail")
         connection.release();
-        }, req.body.userID, req.body.userPW)
+        }, req.query.userID, req.query.userPW)
     });
 });
 
@@ -42,11 +40,11 @@ app.post('/edit', (req, res)=> {
     database.connect(function (connection){
         user.signIn(connection,
         (rows)=>{
-        req.send("success")
+        res.send("success")
         connection.release();
         },
         (err)=>{
-        req.send("fail")
+        res.send("fail")
         connection.release();
         }, req.body.userID, req.body.userPW, req.body.userNewPW)
     });
@@ -57,19 +55,14 @@ app.post('/delete', (req, res)=> {
     database.connect(function (connection){
         user.deleteID(connection,
         (rows)=>{
-        req.send("success")
+        res.send("success")
         connection.release();
         },
         (err)=>{
-        req.send("fail")
+        res.send("fail")
         connection.release();
         }, req.body.userID, req.body.userPW)
     });
-});
-
-app.get('/', (req, res)=> {
-    console.log('접속 탐지')
-    res.send('success')
 });
 
 app.get('/board', (req, res)=>{

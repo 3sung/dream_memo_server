@@ -74,18 +74,14 @@ module.exports = {
             }
         )
     },
-    getToken: function(userID){
+    getToken: function(connection, userID){
         var token = jwt.sign({
             id: userID
-        }, secret);
+        }, 'secret');
         connection.query(
-            "INSERT INTO `DREAMMEMO_DB`.`User_TOKEN_TB` VALUES ('userId','token')",
+            "INSERT INTO `DREAMMEMO_DB`.`UserLoginToken_TB` (`userID`, `token`) VALUES (?, ?);",
+            [userID, token],
             function(err, rows, fields){
-                if(err) {
-                    fail(err)
-                } else {
-                    success(rows);
-                }
             }
         )
         return token;

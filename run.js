@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
 app.post('/signUp', (req, res)=> {
-    console.log(req);
+    console.log('SignUp Request');
     database.connect(function (connection) {
         user.signUp(connection,
             (rows)=>{
@@ -23,6 +23,7 @@ app.post('/signUp', (req, res)=> {
 });
 
 app.get('/signIn', (req, res)=> {
+    console.log('SignIn Request');
     database.connect(function (connection){
         user.signIn(connection,
         (rows)=>{
@@ -68,6 +69,7 @@ app.post('/delete', (req, res)=> {
 });
 
 app.get('/board', (req, res)=>{
+    console.log('board View Request');
     database.connect(function (connection) {
         community.viewBoard(connection,
             (rows)=>{
@@ -81,6 +83,7 @@ app.get('/board', (req, res)=>{
 });
 
 app.get('/board/search', (req, res)=>{
+    console.log('board search Request');
     database.connect(function (connection) {
         community.searchBoard(connection,
             (rows)=>{

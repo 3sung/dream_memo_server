@@ -39,7 +39,7 @@ app.get('/signIn', (req, res)=> {
     });
 });
 
-app.post('/edit', (req, res)=> {
+app.post('/user/edit', (req, res)=> {
     console.log(req);
     database.connect(function (connection){
         user.signIn(connection,
@@ -54,7 +54,7 @@ app.post('/edit', (req, res)=> {
     });
 });
 
-app.post('/delete', (req, res)=> {
+app.post('/user/delete', (req, res)=> {
     database.connect(function (connection){
         user.deleteID(connection,
         (rows)=>{

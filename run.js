@@ -2,7 +2,10 @@ const app = require('express')();
 const database = require('./database');
 const user = require('./manage/user');
 const community = require('./manage/community');
+const bodyParser = require('body-parser');
 
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
 
 app.post('/signUp', (req, res)=> {
     console.log(req);
@@ -51,7 +54,6 @@ app.post('/edit', (req, res)=> {
 });
 
 app.post('/delete', (req, res)=> {
-    console.log(req);
     database.connect(function (connection){
         user.deleteID(connection,
         (rows)=>{
@@ -92,6 +94,6 @@ app.get('/board/search', (req, res)=>{
 });
 
 
-app.listen(80, () => {
+app.listen(3000, () => {
     console.log('App listening on port 3000!');
 });

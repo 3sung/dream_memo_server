@@ -26,6 +26,19 @@ module.exports = {
             }
         )
     },
+    postKeyword: function(connection, success, fail, boardID, keyword) {
+        connection.query(
+            "INSERT INTO `DREAMMEMO_DB`.`DreamBoardKeyword` (`BoardID`, `KeyWord`) VALUES (?, ?);",
+            [boardID, keyword],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
+    },
 
     searchBoard: function (connection, success, fail, searchKeyword) {
         connection.query(

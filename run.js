@@ -147,6 +147,52 @@ app.post('/board', (req, res)=>{
     })
 });
 
+app.post('/board/keywords', (req, res)=>{
+    console.log('board post Request');
+    database.connect(function (connection) {
+        checkToken(req.headers.authorization, function (userID) {
+            
+            connection.query(
+                "SELECT ID FROM DREAMMEMO_DB.DreamBoard_TB where ID=? and UserID=?;",
+                [req.body.boardID, userID],
+                function (err, rows) {
+
+                    if(err) {
+                        res.send("알수없는 오류\r\n")
+                    } else if(rows.length===0) {
+                        res.send("올바른 ID로 로그인해주세요")
+                    } else {
+                        community.postKeyword(connection,
+                            (rows)=>{
+                                res.send("키워드 등록 성공.\r\n")
+                            },
+                            (err)=>{
+                                switch(err.code) {
+                                    case 'ER_BAD_NULL_ERROR':
+                                        res.status(400).send("전달된 인자 부족\r\n");
+                                        break;
+                                    case 'ER_NO_REFERENCED_ROW_2':
+                                        res.status(400).send("등록되지 않은 키워드입니다.\r\n");
+                                        break;
+                                    case 'ER_DUP_ENTRY':
+                                        res.status(400).send("이미 등록된 키워드입니다.\r\n");
+                                        break;
+                                    default:
+                                        console.log(err)
+                                        res.send("알 수 없는 오류\r\n")
+                                }
+                                connection.release()
+                            }, req.body.boardID, req.body.keyword)
+                    }
+                }
+            )
+
+        }, function (err) {
+            res.send("인증되지 않은 토큰입니다.\r\n")
+        })
+    })
+});
+
 app.get('/board/search', (req, res)=>{
     database.connect(function (connection) {
         community.searchBoard(connection,

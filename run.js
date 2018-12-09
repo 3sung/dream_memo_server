@@ -136,8 +136,7 @@ app.post('/board', (req, res)=>{
                 }, userID, req.body.dreamContent, req.body.commentContent)
 
         }, function (err) {
-            console.error(err)
-            res.send("fail\r\n")
+            res.send("인증되지 않은 토큰입니다.\r\n")
         })
     })
 });

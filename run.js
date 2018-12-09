@@ -3,27 +3,47 @@ const database = require('./database');
 const user = require('./manage/user');
 const community = require('./manage/community');
 const bodyParser = require('body-parser');
+require('date-utils');
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+
+function checkToken(token, success, fail) {
+    database.connect(function (connection) {
+        connection.query(
+            "SELECT * FROM DREAMMEMO_DB.UserLoginToken_TB where token=?;",
+            [token],
+            function (err, rows, fields) {
+                if(err) {
+                    fail(err)
+                } else if(rows.length===0) {
+                    fail({code:"Invalid Token"})
+                } else {
+                    success(rows[0].userID)
+                }
+                connection.release()
+            }
+        )
+    })
+}
 
 app.post('/signUp', (req, res)=> {
     database.connect(function (connection) {
         user.signUp(connection,
             (rows)=>{
-            res.send("success")
+            res.send("회원가입 성공. 다시 로그인 해주세요\r\n")
             connection.release();
             },
             (err)=>{
             switch(err.code) {
                 case "ER_DUP_ENTRY":
-                    res.status(500).send("계정이 중복됩니다.");
+                    res.status(500).send("계정이 중복됩니다.\r\n");
                     break;
                 case "ER_BAD_NULL_ERROR":
-                    res.status(500).send("전달된 인자가 부족합니다."+err.sqlMessage);
+                    res.status(500).send("전달된 인자가 부족합니다.\r\n");
                     break;
                 default:
-                    res.status(500).send("알 수 없는 오류");
+                    res.status(500).send("알 수 없는 오류\r\n");
                     break;
             }
             connection.release();
@@ -42,14 +62,14 @@ app.get('/signIn', (req, res)=> {
         },
         (err)=>{
             if(err==null) {
-                res.status(500).send("잘못된 id 혹은 비밀번호입니다.");
+                res.status(500).send("잘못된 id 혹은 비밀번호입니다.\r\n");
             } else {
                 switch(err.code) {
                     case "ER_BAD_NULL_ERROR":
-                        res.status(500).send("전달된 인자가 부족합니다."+err.sqlMessage);
+                        res.status(500).send("전달된 인자가 부족합니다.\r\n");
                         break;
                     default:
-                        res.status(500).send("알 수 없는 오류");
+                        res.status(500).send("알 수 없는 오류\r\n");
                         break;
                 }
             }
@@ -63,11 +83,11 @@ app.post('/user/edit', (req, res)=> {
     database.connect(function (connection){
         user.signIn(connection,
         (rows)=>{
-        res.send("success")
+        res.send("success\r\n")
         connection.release();
         },
         (err)=>{
-        res.send("fail")
+        res.send("fail\r\n")
         connection.release();
         }, req.body.userID, req.body.userPW, req.body.userNewPW)
     });
@@ -77,11 +97,11 @@ app.post('/user/delete', (req, res)=> {
     database.connect(function (connection){
         user.deleteID(connection,
         (rows)=>{
-        res.send("success")
+        res.send("success\r\n")
         connection.release();
         },
         (err)=>{
-        res.send("fail")
+        res.send("fail\r\n")
         connection.release();
         }, req.body.userID, req.body.userPW)
     });
@@ -96,8 +116,29 @@ app.get('/board', (req, res)=>{
             },
             (err)=>{
                 console.error("/board 조회 오류 : "+err);
-                res.send("fail")
+                res.send("fail\r\n")
             })
+    })
+});
+
+app.post('/board', (req, res)=>{
+    console.log('board post Request');
+    database.connect(function (connection) {
+        checkToken(req.headers.authorization, function (userID) {
+
+            community.postBoard(connection,
+                (rows)=>{
+                    res.send("게시글 작성 성공.\r\n")
+                },
+                (err)=>{
+                    console.error(err);
+                    res.send("fail\r\n")
+                }, userID, req.body.dreamContent, req.body.commentContent)
+
+        }, function (err) {
+            console.error(err)
+            res.send("fail\r\n")
+        })
     })
 });
 
@@ -105,15 +146,35 @@ app.get('/board/search', (req, res)=>{
     database.connect(function (connection) {
         community.searchBoard(connection,
             (rows)=>{
-                res.send(rows)
+                res.send(rows);
+                connection.release()
             },
             (err)=>{
                 console.error("/board/search 조회 검색 오류 : "+err);
-                res.send("fail")
+                res.send("fail\r\n");
+                connection.release()
             }, req.query.keyword)
     })
 });
 
+app.get('/board/replies', (req, res)=>{
+    if(req.query.boardID===undefined) {
+        res.status(400).send("boardID를 확인하지 못했습니다\r\n");
+        return
+    }
+    database.connect(function (connection) {
+        community.viewReplies(connection,
+            (rows)=>{
+                res.send(rows);
+                connection.release()
+            },
+            (err)=>{
+                console.error(err);
+                res.send("알 수 없는 오류\r\n");
+                connection.release()
+            }, req.query.boardID)
+    })
+});
 
 app.listen(3000, () => {
     console.log('App listening on port 3000!');

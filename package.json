@@ -5,6 +5,7 @@
   "main": "database.js",
   "dependencies": {
     "bcrypt": "^3.0.2",
+    "date-utils": "^1.2.21",
     "express": "^4.16.4",
     "jquery-validation": "^1.19.0",
     "jsonwebtoken": "^8.4.0",

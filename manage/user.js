@@ -20,7 +20,7 @@ module.exports = {
             "SELECT ID, Password FROM `DREAMMEMO_DB`.`User_TB` WHERE ID=? AND Password=?",
             [userID, userPassword],
             function (err, rows, fields) {
-                if(err) {
+                if(err || rows.length!==1) {
                     fail(err)
                 } else {
                     success(rows)

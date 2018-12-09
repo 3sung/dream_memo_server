@@ -8,7 +8,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 
 app.post('/signUp', (req, res)=> {
-    console.log('SignUp Request');
     database.connect(function (connection) {
         user.signUp(connection,
             (rows)=>{
@@ -16,25 +15,45 @@ app.post('/signUp', (req, res)=> {
             connection.release();
             },
             (err)=>{
-            res.send("fail")
+            switch(err.code) {
+                case "ER_DUP_ENTRY":
+                    res.status(500).send("계정이 중복됩니다.");
+                    break;
+                case "ER_BAD_NULL_ERROR":
+                    res.status(500).send("전달된 인자가 부족합니다."+err.sqlMessage);
+                    break;
+                default:
+                    res.status(500).send("알 수 없는 오류");
+                    break;
+            }
             connection.release();
             }, req.body.userID, req.body.userEmail, req.body.userPW)
     });
 });
 
 app.get('/signIn', (req, res)=> {
-    console.log('SignIn Request');
     database.connect(function (connection){
         user.signIn(connection,
-        (rows)=>{
-        res.json({
-            token: user.getToken(connection, req.query.userID)
-        });
-        connection.release();
+            (rows)=>{
+            res.json({
+                token: user.getToken(connection, req.query.userID)
+            });
+            connection.release();
         },
         (err)=>{
-        res.send("fail")
-        connection.release();
+            if(err==null) {
+                res.status(500).send("잘못된 id 혹은 비밀번호입니다.");
+            } else {
+                switch(err.code) {
+                    case "ER_BAD_NULL_ERROR":
+                        res.status(500).send("전달된 인자가 부족합니다."+err.sqlMessage);
+                        break;
+                    default:
+                        res.status(500).send("알 수 없는 오류");
+                        break;
+                }
+            }
+            connection.release();
         }, req.query.userID, req.query.userPW)
     });
 });
@@ -83,7 +102,6 @@ app.get('/board', (req, res)=>{
 });
 
 app.get('/board/search', (req, res)=>{
-    console.log('board search Request');
     database.connect(function (connection) {
         community.searchBoard(connection,
             (rows)=>{

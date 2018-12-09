@@ -13,10 +13,10 @@ module.exports = {
             }
         )
     },
-    postBoard: function(connection, success, fail, userID, DreamContent, CommentContent) {
+    postBoard: function(connection, success, fail, userID, Title, DreamContent, CommentContent) {
         connection.query(
-            "INSERT INTO `DREAMMEMO_DB`.`DreamBoard_TB` (`UserID`, `DreamContent`, `CommentContent`, `Time`) VALUES (?, ?, ?, ?);",
-            [userID, DreamContent, CommentContent, (new Date()).toFormat('YYYY-MM-DD HH24:MI:SS')],
+            "INSERT INTO `DREAMMEMO_DB`.`DreamBoard_TB` (`UserID`, `Title`, `DreamContent`, `CommentContent`, `Time`) VALUES (?, ?, ?, ?, ?);",
+            [userID, Title, DreamContent, CommentContent, (new Date()).toFormat('YYYY-MM-DD HH24:MI:SS')],
             function (err, rows, fields) {
                 if(err){
                     fail(err)

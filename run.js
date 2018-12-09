@@ -131,9 +131,15 @@ app.post('/board', (req, res)=>{
                     res.send("게시글 작성 성공.\r\n")
                 },
                 (err)=>{
-                    console.error(err);
-                    res.send("fail\r\n")
-                }, userID, req.body.dreamContent, req.body.commentContent)
+                    switch(err.code) {
+                        case 'ER_BAD_NULL_ERROR':
+                            res.status(400).send("전달된 인자 부족\r\n");
+                            break;
+                        default:
+                            res.send("알 수 없는 오류\r\n")
+                    }
+                    connection.release()
+                }, userID, req.body.title, req.body.dreamContent, req.body.commentContent)
 
         }, function (err) {
             res.send("인증되지 않은 토큰입니다.\r\n")

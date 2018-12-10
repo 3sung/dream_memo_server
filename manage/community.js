@@ -117,5 +117,18 @@ module.exports = {
                 }
             }
         )
+    },
+    deleteReply: function (connection, success, fail, commentID, userID) {
+        connection.query(
+            "DELETE FROM `DREAMMEMO_DB`.`DreamBoardReply_TB` WHERE (`ID` = ? and `UserID` = ?);\n",
+            [commentID, userID],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
     }
 };

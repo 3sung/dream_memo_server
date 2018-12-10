@@ -91,5 +91,18 @@ module.exports = {
                 }
             }
         )
+    },
+    postReply: function (connection, success, fail, boardID, userID, content) {
+        connection.query(
+            "INSERT INTO `DREAMMEMO_DB`.`DreamBoardReply_TB` (`BoardID`, `UserID`, `Content`) VALUES (?, ?, ?);",
+            [boardID, userID, content],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
     }
 };

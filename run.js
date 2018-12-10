@@ -266,6 +266,31 @@ app.get('/board/replies', (req, res)=>{
     })
 });
 
+app.post('/board/replies', (req, res)=>{
+    database.connect(function (connection) {
+        checkToken(req.headers.authorization, function (userID) {
+
+            community.postReply(connection,
+                (rows)=>{
+                    res.send("게시글 작성 성공.\r\n")
+                },
+                (err)=>{
+                    switch(err.code) {
+                        case 'ER_BAD_NULL_ERROR':
+                            res.status(400).send("전달된 인자 부족\r\n");
+                            break;
+                        default:
+                            res.send("알 수 없는 오류\r\n")
+                    }
+                    connection.release()
+                }, req.body.boardID, userID, req.body.content)
+
+        }, function (err) {
+            res.send("인증되지 않은 토큰입니다.\r\n")
+        })
+    })
+});
+
 app.listen(3000, () => {
     console.log('App listening on port 3000!');
 });

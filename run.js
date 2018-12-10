@@ -121,6 +121,19 @@ app.get('/board', (req, res)=>{
     })
 });
 
+app.get('/board/:userID', (req, res)=>{
+    database.connect(function (connection) {
+        community.viewUserBoard(connection,
+            (rows)=>{
+                res.send(rows)
+            },
+            (err)=>{
+                console.error("/board 조회 오류 : "+err);
+                res.send("fail\r\n")
+            }, req.params.userID)
+    })
+});
+
 app.post('/board', (req, res)=>{
     console.log('board post Request');
     database.connect(function (connection) {
@@ -151,16 +164,14 @@ app.post('/board/keywords', (req, res)=>{
     console.log('board post Request');
     database.connect(function (connection) {
         checkToken(req.headers.authorization, function (userID) {
-            
             connection.query(
                 "SELECT ID FROM DREAMMEMO_DB.DreamBoard_TB where ID=? and UserID=?;",
                 [req.body.boardID, userID],
                 function (err, rows) {
-
                     if(err) {
                         res.send("알수없는 오류\r\n")
                     } else if(rows.length===0) {
-                        res.send("올바른 ID로 로그인해주세요")
+                        res.send("올바른 ID로 로그인해주세요\r\n")
                     } else {
                         community.postKeyword(connection,
                             (rows)=>{
@@ -186,7 +197,6 @@ app.post('/board/keywords', (req, res)=>{
                     }
                 }
             )
-
         }, function (err) {
             res.send("인증되지 않은 토큰입니다.\r\n")
         })

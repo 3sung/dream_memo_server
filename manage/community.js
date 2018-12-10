@@ -13,6 +13,19 @@ module.exports = {
             }
         )
     },
+    viewUserBoard: function(connection, success, fail, userID) {
+        connection.query(
+            "SELECT * FROM DREAMMEMO_DB.DreamBoard_TB Where UserID=?;",
+            [userID],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
+    },
     postBoard: function(connection, success, fail, userID, Title, DreamContent, CommentContent) {
         connection.query(
             "INSERT INTO `DREAMMEMO_DB`.`DreamBoard_TB` (`UserID`, `Title`, `DreamContent`, `CommentContent`, `Time`) VALUES (?, ?, ?, ?, ?);",

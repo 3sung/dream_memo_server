@@ -31,7 +31,8 @@ app.post('/signUp', (req, res)=> {
     database.connect(function (connection) {
         user.signUp(connection,
             (rows)=>{
-            res.send("회원가입 성공. 다시 로그인 해주세요\r\n")
+            res.send("회원가입 성공. 다시 로그인 해주세요\r\n");
+            console.log(req.body.userID+"가 회원가입함");
             connection.release();
             },
             (err)=>{
@@ -58,6 +59,7 @@ app.get('/signIn', (req, res)=> {
             res.json({
                 token: user.getToken(connection, req.query.userID)
             });
+            console.log(req.query.userID+"가 로그인함");
             connection.release();
         },
         (err)=>{
@@ -113,10 +115,12 @@ app.get('/board', (req, res)=>{
         community.viewBoard(connection,
             (rows)=>{
                 res.send(rows)
+                connection.release()
             },
             (err)=>{
                 console.error("/board 조회 오류 : "+err);
                 res.send("fail\r\n")
+                connection.release()
             })
     })
 });
@@ -126,10 +130,12 @@ app.get('/board/:userID', (req, res)=>{
         community.viewUserBoard(connection,
             (rows)=>{
                 res.send(rows)
+                connection.release()
             },
             (err)=>{
                 console.error("/board 조회 오류 : "+err);
                 res.send("fail\r\n")
+                connection.release()
             }, req.params.userID)
     })
 });
@@ -142,6 +148,7 @@ app.post('/board', (req, res)=>{
             community.postBoard(connection,
                 (rows)=>{
                     res.send("게시글 작성 성공.\r\n")
+                    connection.release()
                 },
                 (err)=>{
                     switch(err.code) {
@@ -272,7 +279,7 @@ app.post('/board/replies', (req, res)=>{
 
             community.postReply(connection,
                 (rows)=>{
-                    res.send("게시글 작성 성공.\r\n")
+                    res.send("댓글 작성 성공.\r\n")
                 },
                 (err)=>{
                     switch(err.code) {

@@ -160,6 +160,35 @@ app.post('/board', (req, res)=>{
     })
 });
 
+app.delete('/board', (req, res)=>{
+    database.connect(function (connection) {
+        checkToken(req.headers.authorization, function (userID) {
+            community.deleteBoard(connection,
+                (rows)=>{
+                if(rows.affectedRows===0) {
+                    res.send("게시글 삭제 실패. 올바른 계정인지와 지우고자 하는 게시글인지 확인해주세요\r\n")
+                } else {
+                    res.send("게시글 삭제 성공\r\n")
+                }
+                    connection.release()
+                },
+                (err)=>{
+                    switch(err.code) {
+                        case 'ER_BAD_NULL_ERROR':
+                            res.status(400).send("전달된 인자 부족\r\n");
+                            break;
+                        default:
+                            res.send("알 수 없는 오류\r\n")
+                    }
+                    connection.release()
+                }, req.body.boardID, userID)
+
+        }, function (err) {
+            res.send("인증되지 않은 토큰입니다.\r\n")
+        })
+    })
+});
+
 app.post('/board/keywords', (req, res)=>{
     console.log('board post Request');
     database.connect(function (connection) {

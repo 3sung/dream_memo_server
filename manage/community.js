@@ -39,6 +39,19 @@ module.exports = {
             }
         )
     },
+    deleteBoard: function(connection, success, fail, boardID, userID) {
+        connection.query(
+            "DELETE FROM `DREAMMEMO_DB`.`DreamBoard_TB` WHERE (`ID` = ? and `UserID` = ?);",
+            [boardID, userID],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
+    },
     postKeyword: function(connection, success, fail, boardID, keyword) {
         connection.query(
             "INSERT INTO `DREAMMEMO_DB`.`DreamBoardKeyword` (`BoardID`, `KeyWord`) VALUES (?, ?);",

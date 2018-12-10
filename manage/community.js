@@ -104,5 +104,18 @@ module.exports = {
                 }
             }
         )
+    },
+    editReply: function (connection, success, fail, commentID, userID, content) {
+        connection.query(
+            "UPDATE `DREAMMEMO_DB`.`DreamBoardReply_TB` SET `Content` = ? WHERE (`ID` = ? and `UserID` = ?);",
+            [content, commentID, userID],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
     }
 };

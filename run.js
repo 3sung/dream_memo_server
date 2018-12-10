@@ -298,6 +298,35 @@ app.post('/board/replies', (req, res)=>{
     })
 });
 
+app.put('/board/replies/:reply', (req, res)=>{
+    database.connect(function (connection) {
+        checkToken(req.headers.authorization, function (userID) {
+            community.editReply(connection,
+                (rows)=>{
+                    if(rows.affectedRows===0) {
+                        res.send("게시글 수정 실패. 올바른 계정인지와 변경하고자 하는 게시글인지 확인해주세요\r\n")
+                    } else {
+                        res.send("게시글 수정 성공\r\n")
+                    }
+                    connection.release()
+                },
+                (err)=>{
+                    switch(err.code) {
+                        case 'ER_BAD_NULL_ERROR':
+                            res.status(400).send("전달된 인자 부족\r\n");
+                            break;
+                        default:
+                            res.send("알 수 없는 오류\r\n")
+                    }
+                    connection.release()
+                }, req.params.reply, userID, req.body.content)
+
+        }, function (err) {
+            res.send("인증되지 않은 토큰입니다.\r\n")
+        })
+    })
+});
+
 app.listen(3000, () => {
     console.log('App listening on port 3000!');
 });

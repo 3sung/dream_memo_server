@@ -168,7 +168,7 @@ app.post('/board', (req, res)=>{
     })
 });
 
-app.delete('/board', (req, res)=>{
+app.post('/board/delete', (req, res)=>{
     database.connect(function (connection) {
         checkToken(req.headers.authorization, function (userID) {
             community.deleteBoard(connection,
@@ -301,7 +301,7 @@ app.post('/board/replies', (req, res)=>{
     })
 });
 
-app.put('/board/replies/:reply', (req, res)=>{
+app.post('/board/replies/:reply/edit', (req, res)=>{
     database.connect(function (connection) {
         checkToken(req.headers.authorization, function (userID) {
             community.editReply(connection,
@@ -331,7 +331,7 @@ app.put('/board/replies/:reply', (req, res)=>{
     })
 });
 
-app.delete('/board/replies/:reply', (req, res)=>{
+app.post('/board/replies/:reply/delete', (req, res)=>{
     database.connect(function (connection) {
         checkToken(req.headers.authorization, function (userID) {
             community.deleteReply(connection,

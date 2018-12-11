@@ -27,6 +27,25 @@ function checkToken(token, success, fail) {
     })
 }
 
+app.get('/board/replies', (req, res)=>{
+    if(req.query.boardID===undefined) {
+        res.status(400).send("boardID를 확인하지 못했습니다\r\n");
+        return
+    }
+    database.connect(function (connection) {
+        community.viewReplies(connection,
+            (rows)=>{
+                res.send(rows);
+                connection.release()
+            },
+            (err)=>{
+                console.error(err);
+                res.send("알 수 없는 오류\r\n");
+                connection.release()
+            }, req.query.boardID)
+    })
+});
+
 app.post('/signUp', (req, res)=> {
     database.connect(function (connection) {
         user.signUp(connection,
@@ -253,25 +272,6 @@ app.get('/board/search', (req, res)=>{
                 res.send("fail\r\n");
                 connection.release()
             }, req.query.keyword)
-    })
-});
-
-app.get('/board/replies', (req, res)=>{
-    if(req.query.boardID===undefined) {
-        res.status(400).send("boardID를 확인하지 못했습니다\r\n");
-        return
-    }
-    database.connect(function (connection) {
-        community.viewReplies(connection,
-            (rows)=>{
-                res.send(rows);
-                connection.release()
-            },
-            (err)=>{
-                console.error(err);
-                res.send("알 수 없는 오류\r\n");
-                connection.release()
-            }, req.query.boardID)
     })
 });
 

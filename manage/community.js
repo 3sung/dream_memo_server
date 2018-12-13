@@ -1,5 +1,19 @@
 const mysql = require('mysql');
 module.exports = {
+    viewKeywords: function(connection, success, fail, keywords) {
+        connection.query(
+            "SELECT KeyWord tag, Content content FROM DREAMMEMO_DB.DreamKeyword_TB WHERE KeyWord in ('"+keywords.join("', '")+"');",
+            [],
+            function (err, rows, fields) {
+                if(err){
+                    fail(err)
+                } else {
+                    success(rows)
+                }
+            }
+        )
+    },
+
     viewBoard: function (connection, success, fail) {
         connection.query(
             "SELECT * FROM DREAMMEMO_DB.DreamBoard_TB;",

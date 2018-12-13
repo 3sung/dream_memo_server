@@ -361,6 +361,21 @@ app.post('/board/replies/:reply/delete', (req, res)=>{
     })
 });
 
+app.get('/dream_analysis', (req, res)=>{
+    database.connect(function (connection) {
+        community.viewKeywords(connection,
+            (rows)=>{
+                res.send(rows);
+                connection.release()
+            },
+            (err)=>{
+                console.error("/dream_analysis 조회 검색 오류 : "+err);
+                res.send("fail\r\n");
+                connection.release()
+            }, JSON.parse(req.query.tags))
+    })
+});
+
 app.listen(3000, () => {
     console.log('App listening on port 3000!');
 });

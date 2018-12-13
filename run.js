@@ -363,6 +363,11 @@ app.post('/board/replies/:reply/delete', (req, res)=>{
 
 app.get('/dream_analysis', (req, res)=>{
     database.connect(function (connection) {
+        if(req.query.tags===undefined) {
+            res.status(400).send("tags인자를 보내주세요")
+            connection.release()
+            return
+        }
         community.viewKeywords(connection,
             (rows)=>{
                 res.send(rows);
